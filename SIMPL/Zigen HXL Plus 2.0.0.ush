@@ -1,0 +1,120 @@
+[BEGIN]
+  Version=1
+[END]
+[BEGIN]
+  ObjTp=FSgntr
+  Sgntr=UserSPlus
+  RelVrs=1
+  IntStrVrs=1
+  SPlusVrs=4.04.01
+  CrossCplrVrs=1.3
+[END]
+[BEGIN]
+  ObjTp=Hd
+  IncludePath1=..\\AET.Zigen.HxlPlus\\AET.ZigenHxlPlus\\bin\\Debug
+[END]
+[BEGIN]
+  ObjTp=Symbol
+  Exclusions=1,19,20,21,88,89,167,168,179,213,214,215,216,217,225,226,248,249,266,267,310,362,378,380,405,407,408,409,478,522,537,554,586,590,611,624,718,756,767,830,841,842,854,883,955,1032,1062,1079,1128,1129,1134,1140,1157,1158,1195,1199,1220,1221,1222,1223,1299,1348,1349,1439,1472,1473,1499,1746,1803,1975,2229,2354,2514,2523,2532,2706,2707,3235,3236,3427,3454,3567,3568,3601,3602,3708,3902,3903,3912,3918,3925,3926,4206,4207,6114,
+  Exclusions_CDS=5
+  Inclusions_CDS=6
+  Name=Zigen HXL Plus 2.0.0
+  SmplCName=Zigen HXL Plus 2.0.0.usp
+  Code=1
+  SysRev5=4.000
+  SMWRev=2.02.05
+  InputCue1=[~UNUSED~]
+  InputSigType1=Digital
+  InputCue2=[~UNUSED~]
+  InputSigType2=Digital
+  InputList2Cue1=HDMI_Out[1]
+  InputList2SigType1=Analog
+  InputList2Cue2=HDMI_Out[2]
+  InputList2SigType2=Analog
+  InputList2Cue3=HDMI_Out[3]
+  InputList2SigType3=Analog
+  InputList2Cue4=HDMI_Out[4]
+  InputList2SigType4=Analog
+  InputList2Cue5=HDMI_Out[5]
+  InputList2SigType5=Analog
+  InputList2Cue6=HDMI_Out[6]
+  InputList2SigType6=Analog
+  InputList2Cue7=HDMI_Out[7]
+  InputList2SigType7=Analog
+  InputList2Cue8=HDMI_Out[8]
+  InputList2SigType8=Analog
+  InputList2Cue9=RCA_Out[#]
+  InputList2SigType9=Analog
+  ParamCue1=[Reference Name]
+  ParamCue2=Host_Name
+  ParamSigType2=String
+  ParamCue3=Model,HXL-44 Plus,HXL-88 Plus
+  ParamSigType3=List
+  MinVariableInputs=2
+  MaxVariableInputs=2
+  MinVariableInputsList2=20
+  MaxVariableInputsList2=20
+  MinVariableOutputs=0
+  MaxVariableOutputs=0
+  MinVariableOutputsList2=0
+  MaxVariableOutputsList2=0
+  MinVariableParams=2
+  MaxVariableParams=2
+  Expand=expand_separately
+  Expand2=expand_separately
+  ProgramTree=Logic
+  SymbolTree=32
+  Hint=
+  PdfHelp=
+  HelpID= 
+  Render=4
+  Smpl-C=16
+  CompilerCode=-48
+  CompilerParamCode=27
+  CompilerParamCode5=14
+  NumFixedParams=1
+  Pp1=1
+  Pp2=2
+  Pp3=3
+  MPp=3
+  NVStorage=10
+  ParamSigType1=String
+  SmplCInputCue1=o#
+  SmplCOutputCue1=i#
+  SmplCInputList2Cue1=an#
+  SmplCOutputList2Cue1=ai#
+  SPlus2CompiledName=S2_Zigen_HXL_Plus_2_0_0
+  SymJam=NonExclusive
+  FileName=Zigen HXL Plus 2.0.0.ush
+  SIMPLPlusModuleEncoding=0
+  clz1=AET.Zigen.HxlPlus
+[END]
+[BEGIN]
+  ObjTp=Dp
+  H=1
+  Tp=1
+  NoS=False
+[END]
+[BEGIN]
+  ObjTp=Dp
+  H=2
+  Tp=1
+  SD=Address of Zigen HXL Plus unit: http://hostname[:port]/
+  HD=True
+  DV=http://192.168.1.10/
+  NoS=False
+  VVS=0
+[END]
+[BEGIN]
+  ObjTp=Dp
+  H=3
+  Tp=1
+  HD=False
+  NoS=False
+  VVS=2
+  VN=2
+  Val1=HXL-44 Plus
+  Lbl1=HXL-44 Plus
+  Val2=HXL-88 Plus
+  Lbl2=HXL-88 Plus
+[END]

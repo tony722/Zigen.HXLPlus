@@ -1,0 +1,97 @@
+/*******************************************************************************************
+  SIMPL+ Module Information
+*******************************************************************************************/
+/*
+Manufacturer Name: Zigen Corp
+Programmer: Tony Evert / tony722@gmail.com
+
+Support inquiries should be directed to Zigen. However, direct support and custom modifications are 
+available for this module for a fee--as well as general Crestron programming assistance and support. 
+Contact tony722@gmail.com, 509-690-5360
+*/
+
+/*******************************************************************************************
+  Compiler Directives
+*******************************************************************************************/
+#DEFAULT_VOLATILE
+#ENABLE_STACK_CHECKING
+// #ENABLE_TRACE
+
+//#HELP_BEGIN
+//#HELP_END
+
+/*******************************************************************************************
+  Include Libraries
+*******************************************************************************************/
+#INCLUDEPATH "..\\AET.Zigen.HxlPlus\\AET.ZigenHxlPlus\\bin\\Debug"
+#USER_SIMPLSHARP_LIBRARY "AET.Zigen.HxlPlus"
+
+/*******************************************************************************************
+  DIGITAL, ANALOG and SERIAL INPUTS and OUTPUTS
+*******************************************************************************************/
+DIGITAL_INPUT _Skip_; 
+DIGITAL_INPUT _Skip_;
+ANALOG_INPUT  HDMI_Out[8], RCA_Out[12,12];
+
+/*******************************************************************************************
+  Parameters
+*******************************************************************************************/
+STRING_PARAMETER Host_Name[255];
+STRING_PARAMETER Model[12];
+
+/*******************************************************************************************
+  Parameter Properties
+  (Uncomment and declare parameter properties as needed)
+*******************************************************************************************/
+#BEGIN_PARAMETER_PROPERTIES Host_Name
+   propDefaultValue = "http://192.168.1.10/";
+   propShortDescription = "Address of Zigen HXL Plus unit: http://hostname[:port]/";
+#END_PARAMETER_PROPERTIES
+
+#BEGIN_PARAMETER_PROPERTIES Model
+  propList = { "HXL-44 Plus" , "HXL-44 Plus" },{ "HXL-88 Plus" , "HXL-88 Plus" };
+#END_PARAMETER_PROPERTIES
+
+
+/*******************************************************************************************
+  Global Variables
+*******************************************************************************************/
+HxlPlus hxl;
+
+/*******************************************************************************************
+  Functions
+*******************************************************************************************/
+function SwitchVideo(integer out, integer in) { 
+  hxl.SetVideoMatrix.SwitchOutputToInput(out, in);  //Only sends the switch api command to the HXL if the in/out range is valid and different than the last previously sent values. 
+
+  //Optional: Send the switch api command to the HXL if the in/out range is valid (regardless of previously sent values).
+  //if(hxl.SetVideoMatrix.SetOutputToInput(out, in)) hxl.SetVideoMatrix.Execute(); 
+}
+
+function SwitchAudio(integer out, integer in) {
+  hxl.SetAudioMatrix.SwitchOutputToInput(out, in);
+}
+
+
+/*******************************************************************************************
+  Event Handlers
+*******************************************************************************************/
+CHANGE HDMI_Out {
+  SwitchVideo(GetLastModifiedArrayIndex(), HDMI_Out[GetLastModifiedArrayIndex()]);
+}
+
+CHANGE RCA_Out {
+  SwitchAudio(GetLastModifiedArrayIndex(), RCA_Out[GetLastModifiedArrayIndex()]);
+}
+
+
+/*******************************************************************************************
+  Main()
+*******************************************************************************************/
+Function Main() {
+  WaitForInitializationComplete();
+  hxl.HostName = Host_Name;
+  hxl.IsHxl88 = (Model = "HXL-88 Plus");
+  //hxl.Debug = 1;
+}
+
