@@ -9,8 +9,9 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>AET.Zigen.HxlPlus</RootNamespace>
     <AssemblyName>AET.Zigen.HxlPlus</AssemblyName>
-    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -20,6 +21,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -28,6 +30,7 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="mscorlib" />
@@ -47,9 +50,11 @@
     <Reference Include="System.Runtime.Serialization" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="CommandObjects\SetAudioMatrix.cs" />
-    <Compile Include="CommandObjects\SetMatrix.cs" />
-    <Compile Include="CommandObjects\SetVideoMatrix.cs" />
+    <Compile Include="ApiObjects\AudioMatrix.cs" />
+    <Compile Include="ApiObjects\AudioSettings.cs" />
+    <Compile Include="ApiObjects\HxlObject.cs" />
+    <Compile Include="ApiObjects\MatrixObject.cs" />
+    <Compile Include="ApiObjects\VideoMatrix.cs" />
     <Compile Include="HxlPlus.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

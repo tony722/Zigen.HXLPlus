@@ -14,12 +14,12 @@ namespace AET.Zigen.HxlPlus.Tests {
   class AssemblyInit {
     [AssemblyInitialize]
     public static void Init(TestContext _) {
-      ErrorMessage.ErrorMessageHandler = Test.ErrorMessage;
-      Test.HxlPlus.HttpClient = Test.HttpClient;
+      ErrorMessage.ErrorMessageHandler = new TestErrorMessageHandler();
+      Test.HxlPlus.HttpClient = new TestHttpClient();
       Test.HxlPlus.HostName = "http://Test";
-      Test.HxlPlus.Timer = Test.Timer;
-      Test.HxlPlus.SpaceBetweenCommands = 0;
-      Test.HxlPlus.Mutex = Test.Mutex;
+      //Test.HxlPlus.Timer = Test.Timer;
+      //Test.HxlPlus.SpaceBetweenCommands = 0;
+      //Test.HxlPlus.Mutex = Test.Mutex;
     }
   }
 }
