@@ -9,15 +9,10 @@ namespace AET.Zigen.HxlPlus.ApiObjects {
     public VideoMatrix() : base("/SetMatrix", "/GetMatrix") { }
     internal override int OutputCount { get { return HxlPlus.IsHxl88 == 1 ? 8 : 4; } }
     internal override int InputCount { get { return HxlPlus.IsHxl88 == 1 ? 8 : 4; } }
-    public void Poll() {
-      Poll(null);
-    }
 
-    public void Poll(Action callback) {
-      RestClient.HttpGet(GetUrl, (response) => {
-        ParseMatrix(response, HxlPlus.SetVideoOutF);
-        if (callback != null) callback();
-      });
+    public void Poll() {
+      var response = HxlPlus.HttpGet(GetUrl);
+      ParseMatrix(response, HxlPlus.SetVideoOutF);
     }
   }
 }

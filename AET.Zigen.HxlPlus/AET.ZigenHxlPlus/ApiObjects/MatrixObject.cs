@@ -3,7 +3,7 @@ using AET.Unity.SimplSharp;
 using Newtonsoft.Json.Linq;
 
 namespace AET.Zigen.HxlPlus.ApiObjects {
-  public abstract class MatrixObject : HxlObject {
+  public abstract class MatrixObject : HxlPlusObject {
 
     protected MatrixObject(string setUrl, string getUrl) : base(setUrl, getUrl) { }
 
@@ -14,7 +14,7 @@ namespace AET.Zigen.HxlPlus.ApiObjects {
     public void SwitchInputToOutput(int input, int output) {
       if (IOsAreValid(input, output)) {
         string json = string.Format(@"{{""switch"":{{""input"":{0},""output"":{1}}}}}", input - 1, output - 1);
-        RestClient.HttpPost(SetUrl, json, null);
+        HxlPlus.HttpPost(SetUrl, json);
       }
     }
 

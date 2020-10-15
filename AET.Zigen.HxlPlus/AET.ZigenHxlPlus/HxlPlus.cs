@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using AET.Unity.RestClient;
 using AET.Unity.SimplSharp;
+using AET.Unity.SimplSharp.HttpClient;
 using AET.Zigen.HxlPlus.ApiObjects;
 
 namespace AET.Zigen.HxlPlus {
@@ -12,17 +13,24 @@ namespace AET.Zigen.HxlPlus {
   public class HxlPlus : RestClient {
     private ushort selectedAudioSettings;
 
-    public HxlPlus() {
-      AddEmptyDelegatesToSplusOutputs();
-      AudioMatrix = new AudioMatrix {RestClient = this};
-      VideoMatrix = new VideoMatrix {RestClient = this};
-      AllAudioSettings = NewAudioSettings(12);
+    public HxlPlus() : this(new CrestronHttpClient(5)) {
     }
 
-    private AudioSettings[] NewAudioSettings(int size) {
+    public HxlPlus(IHttpClient httpClient) : base(httpClient) {
+      AddEmptyDelegatesToSplusOutputs();
+    }
+
+    public void Initialize() {
+      AudioMatrix = new AudioMatrix { HxlPlus = this };
+      VideoMatrix = new VideoMatrix { HxlPlus = this };
+      AllAudioSettings = InitAudioSettingsArray(12);
+    }
+
+    private AudioSettings[] InitAudioSettingsArray(int size) {
       var audioSettings = new AudioSettings[size];
       for (ushort i = 0; i < size; i++) {
-        audioSettings[i] = new AudioSettings {RestClient = this, Output = (ushort)(i + 1)};
+        audioSettings[i] = new AudioSettings(this) { Output = (ushort)(i + 1)};
+        audioSettings[i].Initialize();
       }
       return audioSettings;
     }
@@ -53,7 +61,7 @@ namespace AET.Zigen.HxlPlus {
       get { return selectedAudioSettings; }
       set {
         selectedAudioSettings = value;
-        CurrentAudioSettings = AllAudioSettings[value- 1];
+        CurrentAudioSettings = AllAudioSettings[value - 1];
         CurrentAudioSettings.Poll();
       }
     }
@@ -103,13 +111,13 @@ namespace AET.Zigen.HxlPlus {
       SetSurroundLevelF = delegate { };
       SetBassEnhancementF = delegate { };
       SetBassLevelF = delegate { };
-      SetBassCFreq80F = delegate { };
-      SetBassCFreq100F = delegate { };
-      SetBassCFreq125F = delegate { };
-      SetBassCFreq150F = delegate { };
-      SetBassCFreq175F = delegate { };
-      SetBassCFreq200F = delegate { };
-      SetBassCFreq225F = delegate { };
+      SetBassCutFreq80F = delegate { };
+      SetBassCutFreq100F = delegate { };
+      SetBassCutFreq125F = delegate { };
+      SetBassCutFreq150F = delegate { };
+      SetBassCutFreq175F = delegate { };
+      SetBassCutFreq200F = delegate { };
+      SetBassCutFreq225F = delegate { };
       SetHighPassF = delegate { };
       SetMuteF = delegate { };
       SetVolumeF = delegate { };
@@ -146,13 +154,13 @@ namespace AET.Zigen.HxlPlus {
     public SetUshortOutputDelegate SetSurroundLevelF { get; set; }
     public SetUshortOutputDelegate SetBassEnhancementF { get; set; }
     public SetUshortOutputDelegate SetBassLevelF { get; set; }
-    public SetUshortOutputDelegate SetBassCFreq80F { get; set; }
-    public SetUshortOutputDelegate SetBassCFreq100F { get; set; }
-    public SetUshortOutputDelegate SetBassCFreq125F { get; set; }
-    public SetUshortOutputDelegate SetBassCFreq150F { get; set; }
-    public SetUshortOutputDelegate SetBassCFreq175F { get; set; }
-    public SetUshortOutputDelegate SetBassCFreq200F { get; set; }
-    public SetUshortOutputDelegate SetBassCFreq225F { get; set; }
+    public SetUshortOutputDelegate SetBassCutFreq80F { get; set; }
+    public SetUshortOutputDelegate SetBassCutFreq100F { get; set; }
+    public SetUshortOutputDelegate SetBassCutFreq125F { get; set; }
+    public SetUshortOutputDelegate SetBassCutFreq150F { get; set; }
+    public SetUshortOutputDelegate SetBassCutFreq175F { get; set; }
+    public SetUshortOutputDelegate SetBassCutFreq200F { get; set; }
+    public SetUshortOutputDelegate SetBassCutFreq225F { get; set; }
     public SetUshortOutputDelegate SetHighPassF { get; set; }
     public SetUshortOutputDelegate SetMuteF { get; set; }
     public SetUshortOutputDelegate SetVolumeF { get; set; }

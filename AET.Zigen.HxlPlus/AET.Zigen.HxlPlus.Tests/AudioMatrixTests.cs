@@ -15,10 +15,12 @@ namespace AET.Zigen.HxlPlus.Tests {
 
     [TestInitialize]
     public void TestInit() {
-      Test.HxlPlus.IsHxl88 = 0;
-      hxl = Test.HxlPlus;
-      api = Test.HxlPlus.AudioMatrix;
       ErrorMessage.Clear();
+      TestHttpClient.Clear();
+
+      hxl = Test.HxlPlus;
+      hxl.IsHxl88 = 0;
+      api = hxl.AudioMatrix;
     }
 
     [DataTestMethod]
@@ -68,10 +70,9 @@ namespace AET.Zigen.HxlPlus.Tests {
       var outputs = new int[8];
       hxl.SetAudioOutF = (index, value) => outputs[index - 1] = value;
       TestHttpClient.ResponseContents = @"{""matrix"": [3,2,1,0,3,2,1,0]}";
-      api.Poll(() => {
-        TestHttpClient.Url.Should().Be("http://test/GetAudioSettings");
-        outputs.Should().BeEquivalentTo(new int[] { 4, 3, 2, 1, 4, 3, 2, 1 });
-      });
+      api.Poll();
+      TestHttpClient.Url.Should().Be("http://test/GetAudioSettings");
+      outputs.Should().BeEquivalentTo(new int[] { 4, 3, 2, 1, 4, 3, 2, 1 });
     }
 
     [TestMethod]

@@ -51,6 +51,10 @@
     <Reference Include="Newtonsoft.Json.Compact">
       <HintPath>C:\ProgramData\Crestron\SDK\Newtonsoft.Json.Compact.dll</HintPath>
     </Reference>
+    <Reference Include="SimplSharpHelperInterface, Version=1.0.0.0, Culture=neutral, PublicKeyToken=1099c178b3b54c3b, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>C:\ProgramData\Crestron\SDK\SimplSharpHelperInterface.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
@@ -58,7 +62,6 @@
     <Reference Include="System.Xml.Linq" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AssemblyInit.cs" />
     <Compile Include="AudioSettingsTests.cs" />
     <Compile Include="VideoMatrixTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

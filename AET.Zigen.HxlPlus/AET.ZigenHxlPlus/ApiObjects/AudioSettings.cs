@@ -1,26 +1,48 @@
 ﻿using System;
 using AET.Unity.RestClient;
 using AET.Unity.SimplSharp;
+using Crestron.SimplSharp.Net.Http;
 using Newtonsoft.Json.Linq;
+using System.Collections.Generic;
 
 namespace AET.Zigen.HxlPlus.ApiObjects {
-  public class AudioSettings : ApiObject {
+  public class AudioSettings : HxlPlusObject {
+    private JObject json;
 
-    public AudioSettings() : base("/SetAudioSettings", "/GetAudioSettings") {
-      AddEmptyDelegatesToSplusOutputs();
+    public AudioSettings(HxlPlus hxlPlus): this() {
+      HxlPlus = hxlPlus;
     }
+    public AudioSettings() : base("/SetAudioSettings", "/GetAudioSettings") { }
 
-    private HxlPlus HxlPlus { get { return RestClient as HxlPlus; } }
+    internal void Initialize() {
+      AddEmptyDelegatesToSplusOutputs();
+      Band115 = new EqSetting(this, "band0", (v) => HxlPlus.SetBand115F(v), (v) => HxlPlus.SetBand115Text(v));
+      Band330 = new EqSetting(this, "band1", (v) => HxlPlus.SetBand330F(v), (v) => HxlPlus.SetBand330Text(v));
+      Band990 = new EqSetting(this, "band2", (v) => HxlPlus.SetBand990F(v), (v) => HxlPlus.SetBand990Text(v));
+      Band3000 = new EqSetting(this, "band3", (v) => HxlPlus.SetBand3000F(v), (v) => HxlPlus.SetBand3000Text(v));
+      Band9900 = new EqSetting(this, "band4", (v) => HxlPlus.SetBand9900F(v), (v) => HxlPlus.SetBand9900Text(v));
+      Treble = new EqSetting(this, "treble", (v) => HxlPlus.SetTrebleF(v), (v) => HxlPlus.SetTrebleText(v));
+      Bass = new EqSetting(this, "basstone", (v) => HxlPlus.SetBassF(v), (v) => HxlPlus.SetBassText(v));
+    }
 
     public ushort Output { get; set; }
 
     #region Mute
+
+    private ushort mute;
     public ushort Mute {
-      get { return GetBool("mute").ToUshort(); }
+      get { return mute; }
       set {
-        Json["mute"] = value.ToBool();
-        SetMuteF(Output, value);
-        if (HxlPlus.SelectedAudioSettings == Output) HxlPlus.SetMuteF(value);
+        if (mute == value) return;
+        PostString("mute", value.ToBool());
+        MuteF = value;
+      }
+    }
+
+    public ushort MuteF {
+      set {
+        mute = value;
+        ShowFeedback(value, SetMuteF, HxlPlus.SetMuteF);
       }
     }
 
@@ -28,35 +50,47 @@ namespace AET.Zigen.HxlPlus.ApiObjects {
 
     #endregion
 
+    #region Volume
+
+    private ushort volume, volumeScaled;
     public ushort Volume {
-      get { return ConvertTo16Bit((long?)Json["volume"], 100); }
+      get { return volume; }
       set {
-        Json["volume"] = ConvertFrom16Bit(value, 100);
-        SetVolumeF(Output, value);
-        if (HxlPlus.SelectedAudioSettings == Output) HxlPlus.SetVolumeF(value);
+        var valueScaled = value.ConvertFrom16Bit(100);
+        if (volumeScaled == valueScaled) return;
+        Post("volume", valueScaled);
+        UpdateVolumeF(value, valueScaled);
       }
     }
+
+    public void UpdateVolumeF(ushort value, ushort valueScaled) {
+      volume = value;
+      volumeScaled = valueScaled;
+      ShowFeedback(value, SetVolumeF, HxlPlus.SetVolumeF);
+    }
+
+    #endregion
 
     #region TuneMode
+
+    private string tuneMode;
     internal string TuneMode {
-      get { return (string)Json["tune mode"]; }
+      get { return tuneMode; }
       set {
-        value = Clean(value);
-        Json["tune mode"] = value;
-        UpdateTuneModeFb(value);
+        if (tuneMode == value) return;
+        Post("tune mode", value);
+        TuneModeF = value;
       }
     }
 
-    private void UpdateTuneModeFb(string value) {
-      SetTuneModeDisabledF(Output, (value == "disabled").ToUshort());
-      SetTuneModePresetsF(Output, (value == "presets").ToUshort());
-      SetTuneModeEqualizerF(Output, (value == "equalizer").ToUshort());
-      SetTuneModeToneControlF(Output, (value == "tonecontrol").ToUshort());
-      if (HxlPlus.SelectedAudioSettings != Output) return;
-      HxlPlus.SetTuneModeDisabledF((value == "disabled").ToUshort());
-      HxlPlus.SetTuneModePresetsF((value == "presets").ToUshort());
-      HxlPlus.SetTuneModeEqualizerF((value == "equalizer").ToUshort());
-      HxlPlus.SetTuneModeToneControlF((value == "tonecontrol").ToUshort());
+    internal string TuneModeF {
+      set {
+        tuneMode = value;
+        ShowFeedback(value == "disabled", SetTuneModeDisabledF, HxlPlus.SetTuneModeDisabledF);
+        ShowFeedback(value == "presets", SetTuneModePresetsF, HxlPlus.SetTuneModePresetsF);
+        ShowFeedback(value == "equalizer", SetTuneModeEqualizerF, HxlPlus.SetTuneModeEqualizerF);
+        ShowFeedback(value == "tonecontrol", SetTuneModeToneControlF, HxlPlus.SetTuneModeToneControlF);
+      }
     }
 
     public void TuneModeDisabled() { TuneMode = "disabled"; }
@@ -66,28 +100,26 @@ namespace AET.Zigen.HxlPlus.ApiObjects {
     #endregion
 
     #region Preset
+
+    private string preset;
     internal string Preset {
-      get { return (string)Json["preset"]; }
+      get { return preset; }
       set {
-        value = Clean(value);
-        Json["preset"] = value;
-        UpdatePresetFb(value);
+        if (preset == value) return;
+        Post("preset", value);
+        PresetF = value;
       }
     }
 
-    private void UpdatePresetFb(string value) {
-      SetPresetFlatF(Output, (value == "flat").ToUshort());
-      SetPresetRockF(Output, (value == "rock").ToUshort());
-      SetPresetClassicalF(Output, (value == "classical").ToUshort());
-      SetPresetDanceF(Output, (value == "dance").ToUshort());
-      SetPresetAcousticF(Output, (value == "acoustic").ToUshort());
-      if (HxlPlus.SelectedAudioSettings != Output) return;
-      HxlPlus.SetPresetFlatF((value == "flat").ToUshort());
-      HxlPlus.SetPresetRockF((value == "rock").ToUshort());
-      HxlPlus.SetPresetClassicalF((value == "classical").ToUshort());
-      HxlPlus.SetPresetDanceF((value == "dance").ToUshort());
-      HxlPlus.SetPresetAcousticF((value == "acoustic").ToUshort());
-
+    internal string PresetF {
+      set {
+        preset = value;
+        ShowFeedback(value == "flat", SetPresetFlatF, HxlPlus.SetPresetFlatF);
+        ShowFeedback(value == "rock", SetPresetRockF, HxlPlus.SetPresetRockF);
+        ShowFeedback(value == "classical", SetPresetClassicalF, HxlPlus.SetPresetClassicalF);
+        ShowFeedback(value == "dance", SetPresetDanceF, HxlPlus.SetPresetDanceF);
+        ShowFeedback(value == "acoustic", SetPresetAcousticF, HxlPlus.SetPresetAcousticF);
+      }
     }
 
     public void PresetFlat() { Preset = "flat"; }
@@ -96,125 +128,114 @@ namespace AET.Zigen.HxlPlus.ApiObjects {
     public void PresetDance() { Preset = "dance"; }
     public void PresetAcoustic() { Preset = "acoustic"; }
     #endregion
-    
+
     #region EQ Bands
-
-    public short Band115 {
-      get { return ConvertEqTo16Bit(GetDouble("band0")); }
-      set {
-        Json["band0"] = ConvertEqFrom16Bit(value);
-        HxlPlus.SetBand115F(value);
-        SetBand115F(Output, value);
-        SetBand115Text(Output, Json["band0"].ToString());
-        if (HxlPlus.SelectedAudioSettings != Output) return;
-        HxlPlus.SetBand115Text(Json["band0"].ToString());
-        HxlPlus.SetBand115F(value);
-      }
-    }
-
-
-    public short Band330 {
-      get { return ConvertEqTo16Bit(GetDouble("band1")); }
-      set {
-        Json["band1"] = ConvertEqFrom16Bit(value);
-        HxlPlus.SetBand330F(value);
-        HxlPlus.SetBand330Text(Json["band1"].ToString());
-      }
-    }
-
-
-
-    public short Band990 {
-      get { return ConvertEqTo16Bit(GetDouble("band2")); }
-      set {
-        Json["band2"] = ConvertEqFrom16Bit(value);
-        HxlPlus.SetBand990F(value);
-        HxlPlus.SetBand990Text(Json["band2"].ToString());
-      }
-    }
-
-
-    public short Band3000 {
-      get { return ConvertEqTo16Bit(GetDouble("band3")); }
-      set {
-        Json["band3"] = ConvertEqFrom16Bit(value);
-        HxlPlus.SetBand3000F(value);
-        HxlPlus.SetBand3000Text(Json["band3"].ToString());
-      }
-    }
-
-    public short Band9900 {
-      get { return ConvertEqTo16Bit(GetDouble("band4")); }
-      set {
-        Json["band4"] = ConvertEqFrom16Bit(value);
-        HxlPlus.SetBand9900F(value);
-        HxlPlus.SetBand9900Text(Json["band4"].ToString());
-      }
-    }
-
-
+    public EqSetting Band115 { get; private set; }
+    public EqSetting Band330 { get; private set; }
+    public EqSetting Band990 { get; private set; }
+    public EqSetting Band3000 { get; private set; }
+    public EqSetting Band9900 { get; private set; }
+    public EqSetting Bass { get; private set; }
+    public EqSetting Treble { get; private set; }
     #endregion
-
-    #region Bass/Treble
-
-    public short Bass {
-      get { return ConvertEqTo16Bit(GetDouble("basstone")); }
-      set {
-        Json["basstone"] = ConvertEqFrom16Bit(value);
-        HxlPlus.SetBassF(value);
-        HxlPlus.SetBassText(Json["basstone"].ToString());
-      }
-
-    }
-
-    public short Treble {
-      get { return ConvertEqTo16Bit(GetDouble("treble")); }
-      set {
-        Json["treble"] = ConvertEqFrom16Bit(value);
-        HxlPlus.SetTrebleF(value);
-        HxlPlus.SetTrebleText(Json["treble"].ToString());
-      }
-    }
-
-    #endregion 
 
     #region Surround
 
+    private ushort surround;
     public ushort Surround {
-      get { return GetBool("surround").ToUshort(); }
+      get { return surround; }
       set {
-        Json["surround"] = value.ToBool();
-        HxlPlus.SetSurroundF(value);
+        if (surround == value) return;
+        PostString("surround", value.ToBool());
+        SurroundF = value;
       }
     }
+
+    public ushort SurroundF {
+      set {
+        surround = value;
+        ShowFeedback(value, SetSurroundF, HxlPlus.SetSurroundF);
+      }
+    }
+
     public void SurroundToggle() { Surround = (ushort)(Surround == 0 ? 1 : 0); }
 
+    private ushort surroundLevel, surroundLevelScaled;
     public ushort SurroundLevel {
-      get { return ConvertTo16Bit(GetInt("surrlevel"), 7); }
+      get { return surroundLevel; }
       set {
-        Json["surrlevel"] = ConvertFrom16Bit(value, 7);
-        HxlPlus.SetSurroundLevelF(value);
+        var valueScaled = value.ConvertFrom16Bit(7);
+        if (surroundLevelScaled == valueScaled) return;
+        Post("surrlevel", valueScaled);
+        UpdateSurroundLevelF(value, valueScaled);
       }
     }
 
+    public void UpdateSurroundLevelF(ushort value, ushort valueScaled) {
+      surroundLevel = value;
+      surroundLevelScaled = valueScaled;
+      ShowFeedback(value, SetSurroundLevelF, HxlPlus.SetSurroundLevelF);
+    }
     #endregion
 
     #region BassEnhancement
 
-    public void BassEnhancementToggle() { BassEnhancement = (ushort)(BassEnhancement == 0 ? 1 : 0); }
+    private ushort bassEnhancement;
     public ushort BassEnhancement {
-      get { return GetBool("bass").ToUshort(); }
+      get { return bassEnhancement; }
       set {
-        Json["bass"] = value.ToBool();
-        HxlPlus.SetBassEnhancementF(value);
+        if (bassEnhancement == value) return;
+        PostString("bass", value.ToBool());
+        BassEnhancementF = value;
       }
     }
 
-    public ushort BassLevel {
-      get { return ConvertTo16Bit(GetInt("basslevel"), 127); }
+    public ushort BassEnhancementF {
       set {
-        Json["basslevel"] = ConvertFrom16Bit(value, 127);
-        HxlPlus.SetBassLevelF(value);
+        bassEnhancement = value;
+        ShowFeedback(value, SetBassEnhancementF, HxlPlus.SetBassEnhancementF);
+      }
+    }
+
+    public void BassEnhancementToggle() { BassEnhancement = (ushort)(BassEnhancement == 0 ? 1 : 0); }
+
+    private ushort bassLevel, bassLevelScaled;
+    public ushort BassLevel {
+      get { return bassLevel; }
+      set {
+        var valueScaled = value.ConvertFrom16Bit(127);
+        if(bassLevelScaled == valueScaled) return;
+        Post("basslevel", valueScaled);
+        UpdateBassLevelF(value, valueScaled);
+      }
+    }
+
+    public void UpdateBassLevelF(ushort value, ushort valueScaled) {
+      bassLevel = value;
+      bassLevelScaled = valueScaled;
+      ShowFeedback(value, SetBassLevelF, HxlPlus.SetBassLevelF);
+    }
+
+    private ushort bassCutoff;
+    internal ushort BassCutoff {
+      get { return bassCutoff; }
+      set {
+        if (bassCutoff == value) return;
+        Post("bassfreq", value);
+        BassCutoffF = value;
+      }
+    }
+
+    internal ushort BassCutoffF {
+      set {
+        bassCutoff = value;
+        ShowFeedback(value == 80, SetBassCutFreq80F, HxlPlus.SetBassCutFreq80F);
+        ShowFeedback(value == 100, SetBassCutFreq100F, HxlPlus.SetBassCutFreq100F);
+        ShowFeedback(value == 125, SetBassCutFreq125F, HxlPlus.SetBassCutFreq125F);
+        ShowFeedback(value == 150, SetBassCutFreq150F, HxlPlus.SetBassCutFreq150F);
+        ShowFeedback(value == 175, SetBassCutFreq175F, HxlPlus.SetBassCutFreq175F);
+        ShowFeedback(value == 200, SetBassCutFreq200F, HxlPlus.SetBassCutFreq200F);
+        ShowFeedback(value == 225, SetBassCutFreq225F, HxlPlus.SetBassCutFreq225F);
       }
     }
 
@@ -226,55 +247,37 @@ namespace AET.Zigen.HxlPlus.ApiObjects {
     public void BassCutFreq200() { BassCutoff = 200; }
     public void BassCutFreq225() { BassCutoff = 225; }
 
-    internal ushort BassCutoff {
-      get { return (ushort)GetInt("bassfreq"); }
+
+    private ushort highPass;
+    public ushort HighPass {
+      get { return highPass; }
       set {
-        Json["bassfreq"] = value;
-        UpdateBassCutFreqFb(value);
+        if (highPass == value) return;
+        PostString("highpass", value.ToBool());
+        HighPassF = value;
       }
     }
 
-    private void UpdateBassCutFreqFb(ushort value) {
-      SetBassCFreq80F(Output, (value == 80).ToUshort());
-      SetBassCFreq100F(Output, (value == 100).ToUshort());
-      SetBassCFreq125F(Output, (value == 125).ToUshort());
-      SetBassCFreq150F(Output, (value == 150).ToUshort());
-      SetBassCFreq175F(Output, (value == 175).ToUshort());
-      SetBassCFreq200F(Output, (value == 200).ToUshort());
-      SetBassCFreq225F(Output, (value == 225).ToUshort());
-      if (HxlPlus.SelectedAudioSettings != Output) return;
-      HxlPlus.SetBassCFreq80F((value == 80).ToUshort());
-      HxlPlus.SetBassCFreq100F((value == 100).ToUshort());
-      HxlPlus.SetBassCFreq125F((value == 125).ToUshort());
-      HxlPlus.SetBassCFreq150F((value == 150).ToUshort());
-      HxlPlus.SetBassCFreq175F((value == 175).ToUshort());
-      HxlPlus.SetBassCFreq200F((value == 200).ToUshort());
-      HxlPlus.SetBassCFreq225F((value == 225).ToUshort());
+    public ushort HighPassF {
+      set {
+        highPass = value;
+        ShowFeedback(value, SetHighPassF, HxlPlus.SetHighPassF);
+      }
     }
 
     public void HighPassToggle() { HighPass = (ushort)(HighPass == 0 ? 1 : 0); }
-    public ushort HighPass {
-      get { return GetBool("highpass").ToUshort(); }
-      set {
-        Json["highpass"] = value.ToBool();
-        HxlPlus.SetHighPassF(value);
-      }
-    }
     #endregion
 
-    public override void Poll() {
-      Poll(null);
-    }
-
-    public void Poll(Action callback) {
-      var postContents = string.Format(@"{{""output"":{0}}}", Output);
-      FillJsonFromPost(postContents,() => {
-        Json = Json["audioInfo"] as JObject;
-        Json["preset"] = Json["presets"];
-        Json.Remove("presets");
+    public void Poll() {
+      var postContents = string.Format(@"{{""output"":{0}}}", Output - 1);
+      var response = HxlPlus.HttpPost(GetUrl, postContents);
+      try {
+        json = JObject.Parse(response);
+        json = json["audioInfo"] as JObject;
         FillFromJsonObject();
-        if (callback != null) callback();
-      });
+      } catch (Exception ex) {
+        ErrorMessage.Error("HxlPlus.AudioSettings.Poll: Error handling Poll() response: {0}", ex.Message);
+      }
     }
 
     public void Refresh() {
@@ -282,51 +285,23 @@ namespace AET.Zigen.HxlPlus.ApiObjects {
     }
 
     private void FillFromJsonObject() {
-      SetMuteF(Output, Mute);
-      SetVolumeF(Output, Volume);
-      UpdateTuneModeFb(TuneMode);
-      UpdatePresetFb(Preset);
-      UpdateBassCutFreqFb(BassCutoff);
-
-      SetBand115F(Output, Band115);
-      SetBand330F(Output, Band330);
-      SetBand990F(Output, Band990);
-      SetBand3000F(Output, Band3000);
-      SetBand9900F(Output, Band9900);
-      SetBassF(Output, Bass);
-      SetTrebleF(Output, Treble);
-      SetSurroundF(Output, Surround);
-      SetSurroundLevelF(Output, SurroundLevel);
-      SetBassEnhancementF(Output, BassEnhancement);
-      SetBassLevelF(Output, BassLevel);
-      SetHighPassF(Output, HighPass);
-
-      if (HxlPlus.SelectedAudioSettings != Output) return;
-      HxlPlus.SetMuteF(Mute);
-      HxlPlus.SetVolumeF(Volume);
-      HxlPlus.SetBand115F(Band115);
-      HxlPlus.SetBand330F(Band330);
-      HxlPlus.SetBand990F(Band990);
-      HxlPlus.SetBand3000F(Band3000);
-      HxlPlus.SetBand9900F(Band9900);
-      HxlPlus.SetBassF(Bass);
-      HxlPlus.SetTrebleF(Treble);
-      HxlPlus.SetSurroundF(Surround);
-      HxlPlus.SetSurroundLevelF(SurroundLevel);
-      HxlPlus.SetBassEnhancementF(BassEnhancement);
-      HxlPlus.SetBassLevelF(BassLevel);
-      HxlPlus.SetHighPassF(HighPass);
-    }
-
-    private void UpdateMatrix() {
-      var matrix = Json["matrix"] as JArray;
-      if (matrix == null) {
-        ErrorMessage.Warn("HxlPlus.AllAudioSettings.Poll() HxlPlus did not return a 'matrix' object in response.");
-        return;
-      }
-
-      var audioMatrix = HxlPlus.AudioMatrix;
-      for (ushort i = 1; i <= audioMatrix.OutputCount; i++) HxlPlus.SetAudioOutF(i, (ushort)(matrix[i - 1].Value<int>() + 1));
+      MuteF = BoolFromJson("mute");
+      ScaledFromJson("volume", 100, UpdateVolumeF);
+      TuneModeF = json["tune mode"].Value<string>();
+      PresetF = json["presets"].Value<string>();
+      Band115.UpdateFeedback(json);
+      Band330.UpdateFeedback(json);
+      Band990.UpdateFeedback(json);
+      Band3000.UpdateFeedback(json);
+      Band9900.UpdateFeedback(json);
+      Bass.UpdateFeedback(json);
+      Treble.UpdateFeedback(json);
+      SurroundF = BoolFromJson("surround");
+      ScaledFromJson("surrlevel", 7, UpdateSurroundLevelF);
+      BassEnhancementF = BoolFromJson("bass");
+      ScaledFromJson("basslevel", 127, UpdateBassLevelF);
+      BassCutoffF = json["bassfreq"].Value<ushort>();
+      HighPassF = BoolFromJson("highpass");
     }
 
     #region Conversion Routines
@@ -340,31 +315,67 @@ namespace AET.Zigen.HxlPlus.ApiObjects {
       o = Math.Round(o * 4) / 4;
       return o;
     }
-    #endregion
 
-    #region IOsAreValid
-    public override bool RequiredFieldsAreValid() {
-      if (!TuneModeIsValid()) return false;
-      if (!PresetIsValid()) return false;
-      if (!ValueIsValid((ushort?)(long?)Json["bassfreq"], "BassCutoff", new ushort?[] { 80, 100, 125, 150, 175, 200, 225 })) return false;
-      if (!ValueIsValid(Output, "Output", 1, (ushort) HxlPlus.AudioMatrix.OutputCount)) return false;
-      return true;
+    private void EqFromJson(string key, Action<short, double> updateFeedback) {
+      var valueScaled = json[key].Value<double>();
+      var value = ConvertEqTo16Bit(valueScaled);
+      updateFeedback(value, valueScaled);
     }
 
-    private bool TuneModeIsValid() {
-      return ValueIsValid(TuneMode, "TuneMode", new[] { "disabled", "presets", "equalizer", "tonecontrol" });
+    private void ScaledFromJson(string key, int scale, Action<ushort, ushort> updateFeedback) {
+      var valueScaled = json[key].Value<int>();
+      var value = valueScaled.ConvertTo16Bit(scale);
+      updateFeedback(value, (ushort)valueScaled);
     }
 
-    private bool PresetIsValid() {
-      return ValueIsValid(Preset, "Preset", new[] { "flat", "rock", "classical", "dance", "acoustic" });
+    private ushort BoolFromJson(string key) {
+      return (ushort)(json[key].Value<bool>() ? 1 : 0);
     }
     #endregion
 
-    public override void Send() {
-      if (lastSent != null) lastSent["output"] = null;
-      Json["output"] = Output - 1;
-      base.Send();
+    #region Json Post Builders
+    internal void Post(string key, string value) {
+      if(value == null) PostObject(key, "null");
+      PostFormatted(@"{{""output"":{0},""{1}"":""{2}""}}", Output - 1, key, value);
     }
+
+    internal void Post(string key, ushort value) {
+      PostObject(key, value);
+    }
+
+    internal void Post(string key, double value) {
+      PostObject(key, value);
+    }
+
+    internal void PostString(string key, bool value) {
+      PostObject(key, value.ToString().ToLower());
+    }
+
+    private void PostObject(string key, object value) {
+      PostFormatted(@"{{""output"":{0},""{1}"":{2}}}", Output - 1, key, value);
+    }
+    #endregion
+
+    #region Feedback routines
+    private void ShowFeedback(ushort value, SetUshortOutputArrayDelegate localDelegate, SetUshortOutputDelegate hxlDelegate) {
+      localDelegate(Output, value);
+      if (Output == HxlPlus.SelectedAudioSettings) hxlDelegate(value);
+    }
+
+    private void ShowFeedback(bool value, SetUshortOutputArrayDelegate localDelegate, SetUshortOutputDelegate hxlDelegate) {
+      ShowFeedback(value.ToUshort(), localDelegate, hxlDelegate);
+    }
+
+      private void ShowFeedback(short value, SetShortOutputArrayDelegate localDelegate, SetShortOutputDelegate hxlDelegate) {
+        localDelegate(Output, value);
+        if (Output == HxlPlus.SelectedAudioSettings) hxlDelegate(value);
+      }
+    private void ShowFeedback(string value, SetStringOutputArrayDelegate localDelegate, SetStringOutputDelegate hxlDelegate) {
+      localDelegate(Output, value);
+      if (Output == HxlPlus.SelectedAudioSettings) hxlDelegate(value);
+    }
+
+    #endregion
 
     #region SPlus Feedback Delegates
     public void AddEmptyDelegatesToSplusOutputs() {
@@ -379,31 +390,17 @@ namespace AET.Zigen.HxlPlus.ApiObjects {
       SetPresetClassicalF = delegate { };
       SetPresetDanceF = delegate { };
       SetPresetAcousticF = delegate { };
-      SetBand115F = delegate { };
-      SetBand330F = delegate { };
-      SetBand990F = delegate { };
-      SetBand3000F = delegate { };
-      SetBand9900F = delegate { };
-      SetBand115Text = delegate { };
-      SetBand330Text = delegate { };
-      SetBand990Text = delegate { };
-      SetBand3000Text = delegate { };
-      SetBand9900Text = delegate { };
-      SetBassF = delegate { };
-      SetTrebleF = delegate { };
-      SetBassText = delegate { };
-      SetTrebleText = delegate { };
       SetSurroundF = delegate { };
       SetSurroundLevelF = delegate { };
       SetBassEnhancementF = delegate { };
       SetBassLevelF = delegate { };
-      SetBassCFreq80F = delegate { };
-      SetBassCFreq100F = delegate { };
-      SetBassCFreq125F = delegate { };
-      SetBassCFreq150F = delegate { };
-      SetBassCFreq175F = delegate { };
-      SetBassCFreq200F = delegate { };
-      SetBassCFreq225F = delegate { };
+      SetBassCutFreq80F = delegate { };
+      SetBassCutFreq100F = delegate { };
+      SetBassCutFreq125F = delegate { };
+      SetBassCutFreq150F = delegate { };
+      SetBassCutFreq175F = delegate { };
+      SetBassCutFreq200F = delegate { };
+      SetBassCutFreq225F = delegate { };
       SetHighPassF = delegate { };
       SetMuteF = delegate { };
       SetVolumeF = delegate { };
@@ -417,31 +414,17 @@ namespace AET.Zigen.HxlPlus.ApiObjects {
     public SetUshortOutputArrayDelegate SetPresetClassicalF { get; set; }
     public SetUshortOutputArrayDelegate SetPresetDanceF { get; set; }
     public SetUshortOutputArrayDelegate SetPresetAcousticF { get; set; }
-    public SetShortOutputArrayDelegate SetBand115F { get; set; }
-    public SetShortOutputArrayDelegate SetBand330F { get; set; }
-    public SetShortOutputArrayDelegate SetBand990F { get; set; }
-    public SetShortOutputArrayDelegate SetBand3000F { get; set; }
-    public SetShortOutputArrayDelegate SetBand9900F { get; set; }
-    public SetShortOutputArrayDelegate SetBassF { get; set; }
-    public SetShortOutputArrayDelegate SetTrebleF { get; set; }
-    public SetStringOutputArrayDelegate SetBand115Text { get; set; }
-    public SetStringOutputArrayDelegate SetBand330Text { get; set; }
-    public SetStringOutputArrayDelegate SetBand990Text { get; set; }
-    public SetStringOutputArrayDelegate SetBand3000Text { get; set; }
-    public SetStringOutputArrayDelegate SetBand9900Text { get; set; }
-    public SetStringOutputArrayDelegate SetBassText { get; set; }
-    public SetStringOutputArrayDelegate SetTrebleText { get; set; }
     public SetUshortOutputArrayDelegate SetSurroundF { get; set; }
     public SetUshortOutputArrayDelegate SetSurroundLevelF { get; set; }
     public SetUshortOutputArrayDelegate SetBassEnhancementF { get; set; }
     public SetUshortOutputArrayDelegate SetBassLevelF { get; set; }
-    public SetUshortOutputArrayDelegate SetBassCFreq80F { get; set; }
-    public SetUshortOutputArrayDelegate SetBassCFreq100F { get; set; }
-    public SetUshortOutputArrayDelegate SetBassCFreq125F { get; set; }
-    public SetUshortOutputArrayDelegate SetBassCFreq150F { get; set; }
-    public SetUshortOutputArrayDelegate SetBassCFreq175F { get; set; }
-    public SetUshortOutputArrayDelegate SetBassCFreq200F { get; set; }
-    public SetUshortOutputArrayDelegate SetBassCFreq225F { get; set; }
+    public SetUshortOutputArrayDelegate SetBassCutFreq80F { get; set; }
+    public SetUshortOutputArrayDelegate SetBassCutFreq100F { get; set; }
+    public SetUshortOutputArrayDelegate SetBassCutFreq125F { get; set; }
+    public SetUshortOutputArrayDelegate SetBassCutFreq150F { get; set; }
+    public SetUshortOutputArrayDelegate SetBassCutFreq175F { get; set; }
+    public SetUshortOutputArrayDelegate SetBassCutFreq200F { get; set; }
+    public SetUshortOutputArrayDelegate SetBassCutFreq225F { get; set; }
     public SetUshortOutputArrayDelegate SetHighPassF { get; set; }
     public SetUshortOutputArrayDelegate SetMuteF { get; set; }
     public SetUshortOutputArrayDelegate SetVolumeF { get; set; }

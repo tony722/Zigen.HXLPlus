@@ -9,18 +9,9 @@ namespace AET.Zigen.HxlPlus.ApiObjects {
     internal override int InputCount { get { return HxlPlus.IsHxl88 == 1 ? 8 : 4;}}
 
     public void Poll() {
-      Poll(null);
-    }
-
-    /// <summary>
-    /// Deprecated: This calls the same api url as AllAudioSettings. That should be used instead.
-    /// </summary>
-    public void Poll(Action callback) {
       var json = @"{""output"":""none""}";
-      RestClient.HttpPost(GetUrl, json, (response) => {
-        ParseMatrix(response, HxlPlus.SetAudioOutF);
-        if (callback != null) callback();
-      });
+      var response = HxlPlus.HttpPost(GetUrl, json);
+      ParseMatrix(response, HxlPlus.SetAudioOutF);
     }
   }
 }

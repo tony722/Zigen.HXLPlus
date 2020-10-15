@@ -14,11 +14,12 @@ namespace AET.Zigen.HxlPlus.Tests {
 
     [TestInitialize]
     public void TestInit() {
-      Test.HxlPlus.IsHxl88 = 1;
-      api = Test.HxlPlus.VideoMatrix;
-      hxl = api.RestClient as HxlPlus;
-      TestHttpClient.Clear();
       ErrorMessage.Clear();
+      TestHttpClient.Clear();
+
+      hxl = Test.HxlPlus;
+      hxl.IsHxl88 = 1;
+      api = hxl.VideoMatrix;
     }
 
     [TestMethod]
@@ -52,10 +53,9 @@ namespace AET.Zigen.HxlPlus.Tests {
       var outputs = new int[8];
       hxl.SetVideoOutF = (index, value) => outputs[index - 1] = value;
       TestHttpClient.ResponseContents = @"{""matrix"": [7,6,5,4,3,2,1,0]}";
-      api.Poll(() => {
-        TestHttpClient.Url.Should().Be("http://test/GetMatrix");
-        outputs.Should().BeEquivalentTo(new int[] { 8, 7, 6, 5, 4, 3, 2, 1 });
-      });
+      api.Poll();
+      TestHttpClient.Url.Should().Be("http://test/GetMatrix");
+      outputs.Should().BeEquivalentTo(new int[] {8, 7, 6, 5, 4, 3, 2, 1});
     }
 
     [TestMethod]

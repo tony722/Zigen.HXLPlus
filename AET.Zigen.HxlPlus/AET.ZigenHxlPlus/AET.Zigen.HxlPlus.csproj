@@ -69,7 +69,8 @@
     </Compile>
     <Compile Include="ApiObjects\AudioMatrix.cs" />
     <Compile Include="ApiObjects\AudioSettings.cs" />
-    <Compile Include="ApiObjects\HxlObject.cs" />
+    <Compile Include="ApiObjects\EqSetting.cs" />
+    <Compile Include="ApiObjects\HxlPlusObject.cs" />
     <Compile Include="ApiObjects\MatrixObject.cs" />
     <Compile Include="ApiObjects\VideoMatrix.cs" />
     <Compile Include="HxlPlus.cs" />

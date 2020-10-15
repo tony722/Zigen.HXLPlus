@@ -15,8 +15,8 @@ namespace AET.Zigen.HxlPlus.Tests {
     [AssemblyInitialize]
     public static void Init(TestContext _) {
       ErrorMessage.ErrorMessageHandler = new TestErrorMessageHandler();
-      Test.HxlPlus.HttpClient = new TestHttpClient();
       Test.HxlPlus.HostName = "http://Test";
+      Test.HxlPlus.Initialize();
       //Test.HxlPlus.Timer = Test.Timer;
       //Test.HxlPlus.SpaceBetweenCommands = 0;
       //Test.HxlPlus.Mutex = Test.Mutex;
