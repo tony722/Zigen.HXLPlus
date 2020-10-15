@@ -4,8 +4,7 @@ using Newtonsoft.Json.Linq;
 
 namespace AET.Zigen.HxlPlus.ApiObjects {
   public abstract class MatrixObject : HxlPlusObject {
-
-    protected MatrixObject(string setUrl, string getUrl) : base(setUrl, getUrl) { }
+    protected MatrixObject(string setUrl, string getUrl) : base (setUrl, getUrl) { }
 
     internal abstract int OutputCount { get; }
     internal abstract int InputCount { get; }

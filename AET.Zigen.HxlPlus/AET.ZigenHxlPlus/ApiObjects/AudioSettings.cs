@@ -9,9 +9,10 @@ namespace AET.Zigen.HxlPlus.ApiObjects {
   public class AudioSettings : HxlPlusObject {
     private JObject json;
 
-    public AudioSettings(HxlPlus hxlPlus): this() {
+    public AudioSettings(HxlPlus hxlPlus) : this() {
       HxlPlus = hxlPlus;
     }
+
     public AudioSettings() : base("/SetAudioSettings", "/GetAudioSettings") { }
 
     internal void Initialize() {
@@ -204,7 +205,7 @@ namespace AET.Zigen.HxlPlus.ApiObjects {
       get { return bassLevel; }
       set {
         var valueScaled = value.ConvertFrom16Bit(127);
-        if(bassLevelScaled == valueScaled) return;
+        if (bassLevelScaled == valueScaled) return;
         Post("basslevel", valueScaled);
         UpdateBassLevelF(value, valueScaled);
       }
@@ -280,10 +281,6 @@ namespace AET.Zigen.HxlPlus.ApiObjects {
       }
     }
 
-    public void Refresh() {
-      FillFromJsonObject();
-    }
-
     private void FillFromJsonObject() {
       MuteF = BoolFromJson("mute");
       ScaledFromJson("volume", 100, UpdateVolumeF);
@@ -335,7 +332,7 @@ namespace AET.Zigen.HxlPlus.ApiObjects {
 
     #region Json Post Builders
     internal void Post(string key, string value) {
-      if(value == null) PostObject(key, "null");
+      if (value == null) PostObject(key, "null");
       PostFormatted(@"{{""output"":{0},""{1}"":""{2}""}}", Output - 1, key, value);
     }
 
@@ -354,6 +351,7 @@ namespace AET.Zigen.HxlPlus.ApiObjects {
     private void PostObject(string key, object value) {
       PostFormatted(@"{{""output"":{0},""{1}"":{2}}}", Output - 1, key, value);
     }
+
     #endregion
 
     #region Feedback routines
@@ -365,16 +363,6 @@ namespace AET.Zigen.HxlPlus.ApiObjects {
     private void ShowFeedback(bool value, SetUshortOutputArrayDelegate localDelegate, SetUshortOutputDelegate hxlDelegate) {
       ShowFeedback(value.ToUshort(), localDelegate, hxlDelegate);
     }
-
-      private void ShowFeedback(short value, SetShortOutputArrayDelegate localDelegate, SetShortOutputDelegate hxlDelegate) {
-        localDelegate(Output, value);
-        if (Output == HxlPlus.SelectedAudioSettings) hxlDelegate(value);
-      }
-    private void ShowFeedback(string value, SetStringOutputArrayDelegate localDelegate, SetStringOutputDelegate hxlDelegate) {
-      localDelegate(Output, value);
-      if (Output == HxlPlus.SelectedAudioSettings) hxlDelegate(value);
-    }
-
     #endregion
 
     #region SPlus Feedback Delegates

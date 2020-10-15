@@ -128,6 +128,7 @@ function InitializeAudioSettings(AudioSettings settings) {
 	RegisterDelegate(settings, SetPresetClassicalF,SetPresetClassicalF);
 	RegisterDelegate(settings, SetPresetDanceF,SetPresetDanceF);
 	RegisterDelegate(settings, SetPresetAcousticF,SetPresetAcousticF);
+  
 	prop = settings.Band115;
 	RegisterDelegate(prop, FeedbackDelegate, SetBand115F);
 	RegisterDelegate(prop, TextFeedbackDelegate, SetBand115Text);

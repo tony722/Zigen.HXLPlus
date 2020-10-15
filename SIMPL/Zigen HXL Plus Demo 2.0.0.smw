@@ -1575,7 +1575,7 @@ Mdl=XPanel 2.0 Smart Graphics
 ObjTp=Ui
 H=1
 DvH=706
-PNm=Z:\Projects\AET\Zigen\SW-41Plus MKIII\SIMPL\SW-41Plus III XPanel.vtp
+PNm=Z:\Projects\AET\Zigen\HXLPlus\SIMPL\HXLPlus XPanel.vtp
 ]
 [
 ObjTp=Cs
@@ -1591,36 +1591,6 @@ Nm1=\
 Sx1=0
 Sy1=0
 Mx1=0
-]
-[
-ObjTp=Bw
-H=1
-Lx=395
-Ly=0
-Rx=790
-Ry=913
-Xm=-1
-Ym=-1
-SH=27
-Z=75
-P=1813
-Ht=4
-Hi=376
-]
-[
-ObjTp=Bw
-H=1
-Lx=790
-Ly=0
-Rx=1185
-Ry=913
-Xm=-1
-Ym=-1
-SH=26
-Z=75
-P=2716
-Ht=4
-Hi=142
 ]
 [
 ObjTp=Et
