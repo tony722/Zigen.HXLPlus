@@ -170,7 +170,7 @@ function InitializeAudioSettings(AudioSettings settings) {
 function Initialize() {
   hxl.HostName = Host_Name;
   hxl.IsHxl88 = (Model = "HXL-88 Plus");
-  hxl.Initialize();
+
 	RegisterDelegate(hxl, SetMuteF, SetSelectedMuteF);
 	RegisterDelegate(hxl, SetVolumeF, SetSelectedVolumeF);
 	RegisterDelegate(hxl, SetTuneModeDisabledF, SetSelectedTuneModeDisabledF);
