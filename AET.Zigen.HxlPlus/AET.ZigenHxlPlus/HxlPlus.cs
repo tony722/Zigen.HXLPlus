@@ -13,7 +13,7 @@ namespace AET.Zigen.HxlPlus {
   public class HxlPlus : RestClient {
     private ushort selectedAudioSettings;
 
-    public HxlPlus() : this(new CrestronHttpClient(5)) {
+    public HxlPlus() : base(new CrestronHttpClient(5)) {
     }
 
     public HxlPlus(IHttpClient httpClient) : base(httpClient) {

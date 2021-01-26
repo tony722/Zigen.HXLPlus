@@ -24,8 +24,6 @@ Contact me via http://iconsultants.net
 /*******************************************************************************************
   Include Libraries
 *******************************************************************************************/
-//#INCLUDEPATH "..\\AET.Zigen.HxlPlus\\AET.ZigenHxlPlus\\bin\\Debug"
-#INCLUDEPATH "Z:\\Projects\\AET\\Zigen\\HXLPlus\\AET.Zigen.HxlPlus\\AET.ZigenHxlPlus\\bin\Debug"
 #USER_SIMPLSHARP_LIBRARY "AET.Zigen.HxlPlus"
 
 /*******************************************************************************************
