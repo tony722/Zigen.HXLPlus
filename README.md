@@ -6,9 +6,10 @@
 This module is written in SIMPL# with SIMPL+ wrapper for use in SIMPL Windows. Use in the same way you'd use a Crestron Digital Media switcher.
 
 ## Crestron Modules:
-## [Download Latest Crestron Module Here v2.5.0a](https://github.com/tony722/Zigen.HXLPlus/raw/v2.5.0a/SIMPL/Zigen%20HXL%20Plus%20Demo_compiled.zip)
+## [Download Latest Crestron Module Here v2.5.0b](https://github.com/tony722/Zigen.HXLPlus/raw/v2.5.0b/SIMPL/Zigen%20HXL%20Plus%20Demo_compiled.zip)
 
 ### Crestron Module Release Archives:
+* [Version 2.5.0b Recompiled again for Crestron db > v200:](https://github.com/tony722/Zigen.HXLPlus/raw/v2.5.0b/SIMPL/Zigen%20HXL%20Plus%20Demo_compiled.zip)
 * [Version 2.5.0a Recompiled for Crestron db > v200:](https://github.com/tony722/Zigen.HXLPlus/raw/v2.5.0a/SIMPL/Zigen%20HXL%20Plus%20Demo_compiled.zip)
 * [Version 2.5.0 For Crestron db < v200:](https://github.com/tony722/Zigen.HXLPlus/raw/v2.5.0/SIMPL/Zigen%20HXL%20Plus%20Demo_compiled.zip)
 * [Version 2.0.0](https://github.com/tony722/Zigen.HXLPlus/raw/v2.0.0/SIMPL/Zigen%20HXL%20Plus%20Demo%202.0.0_compiled.zip)
